@@ -1,7 +1,6 @@
 "use client";
 
-import { type ButtonHTMLAttributes, forwardRef } from "react";
-import Link from "next/link";
+import { type ButtonHTMLAttributes, forwardRef, cloneElement, isValidElement } from "react";
 import { cn } from "@/lib/utils";
 
 interface SkeuomorphicButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -61,12 +60,13 @@ const SkeuomorphicButton = forwardRef<HTMLButtonElement, SkeuomorphicButtonProps
 
     const buttonClasses = cn(baseStyles, variantStyles[variant], sizeStyles[size], className);
 
-    if (asChild) {
-      return (
-        <Link ref={ref as any} className={buttonClasses} {...(props as any)}>
-          {children}
-        </Link>
-      );
+    if (asChild && isValidElement(children)) {
+      const child = children as React.ReactElement<any>;
+      return cloneElement(child, {
+        className: cn(buttonClasses, child.props?.className),
+        ref,
+        ...props,
+      } as any);
     }
 
     return (
