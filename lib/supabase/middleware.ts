@@ -6,9 +6,31 @@ export async function updateSession(request: NextRequest) {
     request,
   })
 
+  // Check if Supabase env vars are set
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    // If env vars are missing, allow all public paths and skip auth
+    const publicPaths = ['/', '/shop', '/login', '/signup', '/auth']
+    const isPublicPath = publicPaths.some(path => 
+      request.nextUrl.pathname === path || request.nextUrl.pathname.startsWith('/shop/')
+    )
+    
+    if (isPublicPath) {
+      return supabaseResponse
+    }
+    
+    // For protected routes without Supabase, redirect to login
+    if (!request.nextUrl.pathname.startsWith('/login') && !request.nextUrl.pathname.startsWith('/signup')) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/login'
+      return NextResponse.redirect(url)
+    }
+    
+    return supabaseResponse
+  }
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       cookies: {
         getAll() {
