@@ -133,7 +133,18 @@ export default function FeaturedDrops() {
                     alt={item.name}
                     fill
                     className="object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                    }}
                   />
+                  {/* Fallback when image fails */}
+                  <div className="absolute inset-0 flex items-center justify-center bg-concrete">
+                    <div className="text-center">
+                      <div className="text-3xl md:text-4xl font-black text-steel/50 font-mono mb-2">FIT</div>
+                      <p className="text-xs font-mono text-primary uppercase">{item.category}</p>
+                    </div>
+                  </div>
 
                   {/* Hot Badge */}
                   {item.hot && (

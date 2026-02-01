@@ -109,13 +109,23 @@ export default function CommunitySection() {
                 {/* Author */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="relative w-12 h-12 border-2 border-primary overflow-hidden">
+                    <div className="relative w-12 h-12 border-2 border-primary overflow-hidden bg-primary/10">
                       <Image
                         src={testimonial.avatar || "/placeholder.svg"}
                         alt={testimonial.name}
                         fill
                         className="object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                        }}
                       />
+                      {/* Fallback avatar */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-lg font-black text-primary">
+                          {testimonial.name[0]?.toUpperCase() || 'U'}
+                        </span>
+                      </div>
                     </div>
                     <div>
                       <p className="font-bold text-foreground">{testimonial.name}</p>

@@ -45,12 +45,15 @@ export default async function ProductPage({ params }: { params: { id: string } }
                   fill
                   className="object-cover"
                   priority
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                  }}
                 />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-steel">
-                  <span className="text-8xl font-black">FIT</span>
-                </div>
-              )}
+              ) : null}
+              <div className="absolute inset-0 flex items-center justify-center text-steel">
+                <span className="text-8xl font-black">FIT</span>
+              </div>
               {product.is_hot && (
                 <div className="absolute top-4 left-4 bg-primary text-primary-foreground px-3 py-2 flex items-center gap-2 z-10">
                   <Flame className="w-4 h-4" />

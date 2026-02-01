@@ -47,19 +47,22 @@ export default async function ShopPage() {
                 className="group relative border-2 border-steel bg-concrete transition-all duration-300 hover:border-primary hover:shadow-[8px_8px_0px_0px_var(--neon)] overflow-hidden"
               >
                 {/* Image */}
-                <div className="relative aspect-square bg-background">
+                <div className="relative aspect-square bg-concrete">
                   {product.images && product.images[0] ? (
                     <Image
                       src={product.images[0]}
                       alt={product.title}
                       fill
                       className="object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                      }}
                     />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-steel">
-                      <span className="text-4xl font-black">FIT</span>
-                    </div>
-                  )}
+                  ) : null}
+                  <div className="absolute inset-0 flex items-center justify-center text-steel">
+                    <span className="text-4xl font-black">FIT</span>
+                  </div>
 
                   {/* Hot Badge */}
                   {product.is_hot && (

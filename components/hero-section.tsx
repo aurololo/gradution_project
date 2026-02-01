@@ -102,7 +102,18 @@ export default function HeroSection() {
                   fill
                   className="object-cover"
                   priority
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                  }}
                 />
+                {/* Fallback when image fails */}
+                <div className="absolute inset-0 flex items-center justify-center bg-industrial">
+                  <div className="text-center">
+                    <div className="text-6xl md:text-8xl font-black text-steel/50 font-mono mb-4">FIT</div>
+                    <p className="text-sm font-mono text-primary uppercase">Featured Item</p>
+                  </div>
+                </div>
                 <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background/90 to-transparent">
                   <div className="flex items-center justify-between">
                     <div>
