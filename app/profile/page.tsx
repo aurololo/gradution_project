@@ -6,32 +6,49 @@ import SkeuomorphicButton from '@/components/skeuomorphic-button'
 import { ShoppingBag, RefreshCw, Users, Package, Heart } from 'lucide-react'
 
 export default async function ProfilePage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  let user = null
+  let profile = null
+  let myProducts = null
+  let myOrders = null
 
-  if (!user) {
+  try {
+    const supabase = await createClient()
+    const authResult = await supabase.auth.getUser()
+    user = authResult.data.user
+
+    if (!user) {
+      redirect('/login')
+    }
+
+    const profileResult = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single()
+
+    profile = profileResult.data
+
+    const productsResult = await supabase
+      .from('products')
+      .select('*')
+      .eq('seller_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(10)
+
+    myProducts = productsResult.data
+
+    const ordersResult = await supabase
+      .from('orders')
+      .select('*, products(*)')
+      .eq('buyer_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(10)
+
+    myOrders = ordersResult.data
+  } catch (err) {
+    console.error('Error loading profile:', err)
     redirect('/login')
   }
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single()
-
-  const { data: myProducts } = await supabase
-    .from('products')
-    .select('*')
-    .eq('seller_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(10)
-
-  const { data: myOrders } = await supabase
-    .from('orders')
-    .select('*, products(*)')
-    .eq('buyer_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(10)
 
   return (
     <main className="min-h-screen bg-background pt-20 pb-12 px-4">

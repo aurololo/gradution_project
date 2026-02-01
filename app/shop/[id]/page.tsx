@@ -6,30 +6,42 @@ import SkeuomorphicButton from '@/components/skeuomorphic-button'
 import { Heart, Flame, MapPin, Shield, Truck } from 'lucide-react'
 
 export default async function ProductPage({ params }: { params: { id: string } }) {
-  const supabase = await createClient()
-  
-  const { data: product, error } = await supabase
-    .from('products')
-    .select(`
-      *,
-      seller:profiles!products_seller_id_fkey (
-        id,
-        username,
-        full_name,
-        avatar_url,
-        rating,
-        location
-      )
-    `)
-    .eq('id', params.id)
-    .single()
+  let product = null
+  let user = null
 
-  if (error || !product) {
+  try {
+    const supabase = await createClient()
+    
+    const result = await supabase
+      .from('products')
+      .select(`
+        *,
+        seller:profiles!products_seller_id_fkey (
+          id,
+          username,
+          full_name,
+          avatar_url,
+          rating,
+          location
+        )
+      `)
+      .eq('id', params.id)
+      .single()
+
+    product = result.data
+
+    if (result.error || !product) {
+      notFound()
+    }
+
+    const authResult = await supabase.auth.getUser()
+    user = authResult.data.user
+  } catch (err) {
+    console.error('Error loading product:', err)
     notFound()
   }
 
-  const { data: { user } } = await supabase.auth.getUser()
-  const isOwner = user?.id === product.seller_id
+  const isOwner = user?.id === product?.seller_id
 
   return (
     <main className="min-h-screen bg-background pt-20 pb-12 px-4">

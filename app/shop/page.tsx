@@ -5,23 +5,35 @@ import { Heart, Flame } from 'lucide-react'
 import SkeuomorphicButton from '@/components/skeuomorphic-button'
 
 export default async function ShopPage() {
-  const supabase = await createClient()
-  
-  const { data: products, error } = await supabase
-    .from('products')
-    .select(`
-      *,
-      profiles:seller_id (
-        username,
-        full_name
-      )
-    `)
-    .eq('status', 'active')
-    .order('created_at', { ascending: false })
-    .limit(20)
+  let products = null
+  let error = null
 
-  if (error) {
-    console.error('Error fetching products:', error)
+  try {
+    const supabase = await createClient()
+    
+    const result = await supabase
+      .from('products')
+      .select(`
+        *,
+        profiles:seller_id (
+          username,
+          full_name
+        )
+      `)
+      .eq('status', 'active')
+      .order('created_at', { ascending: false })
+      .limit(20)
+
+    products = result.data
+    error = result.error
+
+    if (error) {
+      console.error('Error fetching products:', error)
+    }
+  } catch (err) {
+    console.error('Supabase client error:', err)
+    // Continue with empty products array
+    products = []
   }
 
   return (
